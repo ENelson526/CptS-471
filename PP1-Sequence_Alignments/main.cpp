@@ -3,14 +3,14 @@
 std::vector<std::vector<DP_cell*>> table;
 //std::vector<std::vector<std::unique_ptr<DP_cell>>> table;
 std::string s1, s2;
-int match, mismatch, h, g;
+int match = 1, mismatch = -1, h = 0, g = -2;
 int total_matches, total_mismatches, opening_gaps, gap_extensions;
 
 // expecting <executable name> <input file containing both s1 and s2> <0: global, 1: local> <optional: path to parameters config file>
 int main(int argc, char* argv[])
 {
     std::string s1_comp, s2_comp;
-    int score = 0;
+    int score = 0, s1_gap_count = 0, s2_gap_count = 0;
     bool local = false;
     if (argc >= 3)
     {
@@ -47,95 +47,28 @@ int main(int argc, char* argv[])
     std::cout << "Sequence 1 = \"s1\", length = " << s1.length() << " characters\n";
     std::cout << "Sequence 2 = \"s2\", length = " << s2.length() << " characters\n";
     
-
-    std::string shortest, longest;
-    if (s1_comp.length() > s2_comp.length())
-    {
-        longest = s1_comp;
-        shortest = s2_comp;
-    }
-    else
-    {
-        longest = s2_comp;
-        shortest = s1_comp;
-    }
-
-    
     std::cout << "\n\nAlignment Start\n*****************\n";
     
-    for (int i = 0; i < longest.length() / 60 + 1; ++i)
-    {
 
-        std::cout << "s1  " << i * 60 + 1 << "   \t";
-
-        for (int j = i * 60; j < (i + 1) * 60; ++j)
-        {
-            if (j < longest.length())
-                std::cout << longest[j];
-            else
-                break;
-        }
-
-        std::cout << "  " << (i + 1) * 60 << std::endl << "   \t\t";
-
-        for (int j = i * 60; j < (i + 1) * 60; ++j)
-        {
-            if (j < longest.length())
-            {
-                if (longest[j] == shortest[j])
-                {
-                    std::cout << "|";
-                    total_matches++;
-                }
-                else
-                {
-                    std::cout << " ";
-                    if (shortest[j] == '-')
-                    {
-                        try
-                        {
-                            if (shortest.at(j - 1) != '-')
-                                opening_gaps++;
-                            gap_extensions++;
-                        }
-                        catch (std::out_of_range) // this will be out of range on j == 0
-                        {
-                            opening_gaps++;
-                            gap_extensions++;
-                        }
-                    }
-                    else
-                        total_mismatches++;
-                }
-            }
-        }
-        std::cout << std::endl << "s2  " << i * 60 - gap_extensions + 1 << "   \t";
-        // print s2 loop
-        for (int j = i * 60; j < (i + 1) * 60; ++j)
-        {
-            if (j < shortest.length())
-                std::cout << shortest[j];
-            else
-                break;
-        }
-        std::cout << "  " << (i + 1) * 60 - gap_extensions << std::endl << std::endl;
-    }
-
-
-    /*
+    // formatted printing
     for (int i = 0; i < s1_comp.length() / 60 + 1; ++i)
     {
-        std::cout << "s1  " << i * 60 - gap_extensions + 1 << "   \t"; 
-        // print s1_comp
+        std::cout << "s1  " << i * 60 - s1_gap_count + 1<< "   \t";
+
         for (int j = i * 60; j < (i + 1) * 60; ++j)
         {
             if (j < s1_comp.length())
+            {
+                if (s1_comp[j] == '-')
+                    s1_gap_count++;
                 std::cout << s1_comp[j];
+            }
             else
                 break;
         }
-        std::cout << "  " << (i + 1) * 60 - gap_extensions << std::endl << "    \t\t";
-        // connection print
+
+        std::cout << "  " << (i + 1) * 60 - s1_gap_count  << std::endl << "  \t\t";
+
         for (int j = i * 60; j < (i + 1) * 60; ++j)
         {
             if (j < s1_comp.length())
@@ -145,51 +78,69 @@ int main(int argc, char* argv[])
                     std::cout << "|";
                     total_matches++;
                 }
+                else if (s1_comp[j] == '-')
+                {
+                    std::cout << " ";
+                    try 
+                    {
+                        if (s1_comp.at(j - 1) != '-')
+                            opening_gaps++;
+                    }
+                    catch (std::out_of_range)
+                    {
+                        opening_gaps++;
+                    }
+                    gap_extensions++;
+                }
                 else
                 {
                     std::cout << " ";
-                    if (s1_comp[j] == '-')
+                    try 
                     {
-                        if (j)
-                        {
-                            if (s1_comp.at(j - 1) != '-')
-                                opening_gaps++;
-                            gap_extensions++;
-                        }
+                        if (s2_comp.at(j - 1) != '-')
+                            opening_gaps++;
                     }
-                    else
-                        total_mismatches++;
+                    catch (std::out_of_range)
+                    {
+                        opening_gaps++;
+                    }   
+                    gap_extensions++;
                 }
-           }
+            }
         }
-        std::cout << std::endl << "s2  " << i * 60 + 1 << "   \t";
-        // print s2 loop
+
+        std::cout << std::endl << "s2  " << i * 60 - s2_gap_count + 1 << "   \t";
+
+
         for (int j = i * 60; j < (i + 1) * 60; ++j)
         {
             if (j < s2_comp.length())
+            {
+                if (s2_comp[j] == '-')
+                    s2_gap_count++;
                 std::cout << s2_comp[j];
+            }
             else
                 break;
         }
-        std::cout << "  " << (i + 1) * 60 << std::endl << std::endl;
+        std::cout << "  " << (i + 1) * 60 - s2_gap_count << std::endl << std::endl;
+
     }
-    */
-    
+
+
     std::cout << "Score: " << score << std::endl;
     std::cout << "Number of: matches = " << total_matches << ", mismatches = " << total_mismatches << ", opening gaps = " << opening_gaps << ", gap extensions = " << gap_extensions << std::endl;
-    std::cout << "Identities = " << total_matches << "/" << s1.length() << " (" <<  (int)floor((double)total_matches * 100 + 0.5) / s1.length() << "%)" << ", Gaps = " << gap_extensions << "/" << s1.length() << " (" << (int)floor((double)gap_extensions * 100 + 0.5) / s1.length() << "%)" << std::endl;
+    std::cout << "Identities = " << total_matches << "/" << s1_comp.length() << " (" <<  (int)floor((double)total_matches * 100 + 0.5) / s1_comp.length() << "%)" << ", Gaps = " << gap_extensions << "/" << s1_comp.length() << " (" << (int)floor((double)gap_extensions * 100 + 0.5) / s1_comp.length() << "%)" << std::endl;
 
-   
-    /*
     // free memory
-    for (std::vector<DP_cell*>* v : table)
+    for (std::vector<DP_cell*> v : table)
     {
-        for (DP_cell* dp : *v)
+        for (DP_cell* dp : v)
         {
             free(dp);
         }
     }
-   */
+   
 
     return 0;
 }
