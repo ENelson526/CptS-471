@@ -8,7 +8,7 @@ Professor: Ananth Kalyanaraman
 
 ### Programming Project 1 (PP1) - Sequence Alignments
 
-Given two DNA sequences, find their optimal global / local alignments using the Needleman-Wunsch and Smith-Waterman algorithms respectivley.
+Given two DNA sequences, find their optimal global / local alignments using the Needleman-Wunsch and Smith-Waterman algorithms respectively.
 
 Input parameters: 
 
