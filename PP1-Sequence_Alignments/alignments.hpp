@@ -3,9 +3,16 @@
 
 
 #include <iostream>
+#include <algorithm>
 #include <string>
 #include <fstream>
+#include <array>
 #include <vector>
+#include <limits.h>
+#include <math.h>
+#include <memory>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 enum Direction
 {
@@ -42,8 +49,9 @@ struct DP_cell {
 void read_sequence_file(std::string);
 void read_config_file(std::string);
 void fill_global_table();
+void fill_local_table();
 int optimal_global(std::string*, std::string*);
-int local_alignment();
+int local_alignment(std::string*, std::string*);
 
 
 #endif
