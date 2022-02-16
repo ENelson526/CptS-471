@@ -3,32 +3,30 @@
 // reads the sequence data from the file provided through command line arguments
 void read_sequence_file(std::string filename)
 {
-    extern std::string s1, s2;
+    extern std::string s1, s2, s1_name, s2_name;
     std::ifstream infile;
     std::string line;
     infile.open(filename);
 
     if (infile.is_open())
-    {
-        /*
-        // get s1
-        getline(infile, s1);
-
-        // get s2
-        getline(infile, s2);
-        */
-        
-        getline(infile, line); // waste garbage line
+    {   
+        // read name line s1
         getline(infile, line);
+        s1_name = line;
 
+        // read in sequence1
+        getline(infile, line);
         while (line.length() != 0)
         {
             s1 += line;
             getline(infile, line);
         }
 
-        
-        getline(infile, line); // waste s2 garbage line
+        // read name line for s2
+        getline(infile, line); 
+        s2_name = line;
+
+        // read in sequence2
         getline(infile, line);
         while (!infile.eof())
         {
@@ -126,25 +124,6 @@ void fill_global_table()
                 std::cout << "Cannot allocate space for new DP_cell. Aborting\n";
                 abort();
             }
-            /*
-            // Top edge
-            if (i == 0)
-            {
-                table[0][j]->value = j * g;
-                table[0][j]->direction = left;
-                table[0][j]->Sscore = INT_MIN - h - g; // without this, the addition of + h + g will cause an overflow
-                table[0][j]->Dscore = INT_MIN - h - g;
-                table[0][j]->Iscore = h + (j * g);
-            }
-            // left edge
-            if (j == 0)
-            {
-                table[i][0]->value = i * g;
-                table[i][0]->direction = up;
-                table[i][0]->Sscore = INT_MIN - h - g;
-                table[i][0]->Dscore = h + (i * g);
-                table[i][0]->Iscore = INT_MIN - h - g;
-            } */
         }
     }
 
