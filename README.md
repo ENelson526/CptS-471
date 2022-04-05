@@ -13,3 +13,18 @@ Given two DNA sequences, find their optimal global / local alignments using the 
 Input parameters: 
 
 `<executable name> <input file containing both s1 and s2> <0: global, 1: local> <optional: path to parameters config file>`
+
+
+### Programming Project 2 (PP2) - Suffix Tree Construction
+
+Given a sequence, contruct its suffix tree and output the BWT to a file.
+
+Input parameters: 
+
+`<executable name> <input file containing the alphabet of the sequence> <sequence file>`
+
+#### Clarifications
+
+The alphabet input file should contain at least all letters in the sequence file. The alphabet should be in lexiocgraphical order with spaces in between each character. The size of the alphabet is hard-coded into the tree.hpp file. Please change ALPHA_LEN to be the size of the input alphabet.
+
+The sequence file should contain a garbage line on line 1, this is to allow for naming and other info. The program will start reading from line 2
