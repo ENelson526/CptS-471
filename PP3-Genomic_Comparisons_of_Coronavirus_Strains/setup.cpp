@@ -28,6 +28,29 @@ std::vector<std::string> get_input_files()
 
 std::vector<std::string> read_input_files(std::vector<std::string> files)
 {
+	// comment/uncomment to turn on/off automatic file selection
+	//files.resize(10);
+	//files = {
+	//	"Covid_Australia.fasta",
+	//	"Covid_Brazil.fasta",
+	//	"Covid_India.fasta",
+	//	"Covid_USA-CA4.fasta",
+	//	"MERS_2012_KF600620.fasta",
+	//	"MERS_2014_KY581694.fasta",
+	//	"MERS_2014_USA_KP223131.fasta",
+	//	"SARS_2003_GU553363.fasta",
+	//	"SARS_2017_MK062179.fasta"
+	//};
+	/*files.resize(5);
+	files = {
+		"s1.txt",
+		"s2.txt",
+		"s3.txt",
+		"s4.txt",
+		"s5.txt"
+	};*/
+
+
 	std::vector<std::string> contents;
 	int i = 0;
 	std::string line = "";
@@ -36,11 +59,13 @@ std::vector<std::string> read_input_files(std::vector<std::string> files)
 		std::ifstream infile(file);
 		if (infile.is_open())
 		{
+			std::getline(infile, line); // Throw out garbage line
 			contents.push_back(""); // this is done here instead of at the start to account for the possibility of files not opening
 			while (std::getline(infile, line))
 			{
 				contents.at(i) += line;
 			}
+			contents.at(i) += "$";
 			i++;
 		}
 		else

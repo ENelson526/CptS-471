@@ -1,215 +1,177 @@
 #include "tree.hpp"
 
-std::unordered_map<char, int> Node::ALPHA_VALS;
+std::unordered_map<char, int> VALS::ALPHA_VALS;
+std::vector<std::string> VALS::contents;
+std::vector<int> VALS::shortestUniqueSubstr;
+int VALS::k, VALS::numIntNodes;
 
 
-bool Node::is_leaf()
+
+Node* buildGST()
 {
-	for (auto n : this->children)
+	Node* root = new Node(VALS::numIntNodes++, nullptr, nullptr, 0, 0, 0);
+	root->parent = root->SL = root;
+	for (int i = 0; i < VALS::k; ++i)
 	{
-		if (n)
-			return false;
+		build_ST(root, i);
 	}
-	return true;
-}
-
-Node* buildGST(std::vector<std::string> contents, std::unordered_map<char, int> u)
-{
-	Node* root = new Node(0, nullptr, nullptr, 0, 0, 1);
-	root->set_alphabet(u);
-
-	//for (int i = 0; i < contents.size(); ++i)
-	//{
-		root->buildST(contents[0], 1);
-	//}
 	return root;
 }
 
 
-void Node::buildST(std::string s, int s_id)
+void build_ST(Node* root, int s_id)
 {
-	int i = 0;
-	Node* newLeaf, * u, * v, *u_prime, *v_prime;
-	
+	Node* v, * u, * newLeaf, * v_prime, * u_prime;
+	v = u = v_prime = u_prime = nullptr;
 
-	// if this is the first time through, init root
-	if (s_id == 1)
+	newLeaf = findPath(root, 0, s_id);
+
+	for (int i = 1; i < VALS::contents[s_id].length(); ++i)
 	{
-		this->parent = this->SL = this;
-		this->strDepth = 0;
-	}
-	u = this, v = this;
-	s += "$";
-	newLeaf = this->findPath(s, i++);
-
-	for (; i < s.length(); ++i)
-	{
-		u = newLeaf->parent;
-		v = u->SL;
-
-		if (v)
-		{
-			newLeaf = v->findPath(s, i + v->strDepth);
-		}
+		//u = newLeaf->parent;
+		//v = u->SL;
+		
+		//if (v)
+		//{
+			//newLeaf = findPath(v, i + v->strDepth, s_id);
+		newLeaf = findPath(root, i, s_id);
+		//}
+		/*
 		else
 		{
 			u_prime = u->parent;
 			v_prime = u_prime->SL;
 
-			if (u_prime != this)
+			if (u_prime != root)
 			{
-				u->SL = v_prime->nodeHops(s.substr(u->str.first, u->str.second), s, i);
-				newLeaf = u->SL->findPath(s, i + u->SL->strDepth);
+				u->SL = nodeHops(v_prime, VALS::contents[s_id].substr(u->str.first, u->str.second), i, s_id);
+				newLeaf = findPath(u->SL, i + u->SL->strDepth, s_id);
 			}
 			else
 			{
-				u->SL = this->nodeHops(s.substr(u->str.first + 1, u->str.second - 1), s, i);
-				newLeaf = u->SL->findPath(s, i + u->SL->strDepth);
+				std::string beta_prime = VALS::contents[u_prime->s_id].substr(u->str.first + 1, u->str.second - 1);
+				u->SL = nodeHops(root, beta_prime, i, s_id);
+				newLeaf = findPath(u->SL, i + u->SL->strDepth, s_id);
 			}
-		}
+		}*/
 	}
+
 }
 
-Node* Node::nodeHops(std::string beta, std::string s, int i)
+Node* nodeHops(Node* v, std::string beta, int i, int s_id)
 {
-	Node* child = this->children[ALPHA_VALS[beta[0]]];
+	if (beta == "")
+		return v;
+
+	Node* child = v->children[VALS::ALPHA_VALS[beta[0]]];
 
 	if (child)
 	{
 		if (child->str.second < beta.length())
-		{
-			return child->nodeHops(beta.substr(child->str.second), s, i + child->str.second);
-		}
+			return nodeHops(child, beta.substr(child->str.second), i + child->str.second, s_id);
 		else if (child->str.second == beta.length())
 			return child;
 		else
 		{
-			int j = 0;
-			std::string childStr = s.substr(child->str.first, child->str.second);
+			int j = beta.length();
+			// string for old s_id, should be broken to path of old node
+			std::string childStr = VALS::contents[child->s_id].substr(child->str.first, child->str.second);
 
-			j = beta.length();
+			Node* newIntNode = new Node(VALS::numIntNodes++, v, nullptr, child->str.first, j, child->s_id);
+			std::memcpy(&newIntNode->children[VALS::ALPHA_VALS[childStr[j]]], &child, sizeof(Node*));
 
-			Node* newIntNode = new Node(0, this, nullptr, child->str.first, j, -1);
-			std::memcpy(&newIntNode->children[this->ALPHA_VALS[childStr[j]]], &child, sizeof(Node*));
-			newIntNode->children[ALPHA_VALS[childStr[j]]]->parent = newIntNode;
-			newIntNode->children[ALPHA_VALS[childStr[j]]]->str = { child->str.first + j, childStr.length() - j };
-			this->children[ALPHA_VALS[beta[0]]] = newIntNode;
+			newIntNode->children[VALS::ALPHA_VALS[childStr[j]]]->parent = newIntNode;
+			newIntNode->children[VALS::ALPHA_VALS[childStr[j]]]->str = { child->str.first + j, childStr.length() - j };
+
+			v->children[VALS::ALPHA_VALS[beta[0]]] = newIntNode;
 
 			return newIntNode;
 		}
 	}
 	else
-	{
-		return this;
-	}
+		return v;
 }
 
-Node* Node::findPath(std::string s, int i)
-{
-	std::string x = s.substr(i);
 
-	if (this->children[ALPHA_VALS[x[0]]])
+Node* findPath(Node* u, int i, int s_id)
+{
+	Node* child = u->children[VALS::ALPHA_VALS[VALS::contents[s_id][i]]];
+	if (child)
 	{
 		int j = 0;
-		
-		std::string edgeString = s.substr(this->children[ALPHA_VALS[x[0]]]->str.first, this->children[ALPHA_VALS[x[0]]]->str.second);
 
-		if (x.substr(0, edgeString.length()) == edgeString)
-		{
-			return this->children[ALPHA_VALS[x[0]]]->findPath(s, i + edgeString.length());
-		}
+		// existing edge string (from child's s_id)
+		std::string edgeString = VALS::contents[child->s_id].substr(child->str.first, child->str.second);
+
+		if (VALS::contents[s_id].substr(i, edgeString.length()) == edgeString)
+			return findPath(child, i + edgeString.length(), s_id);
 
 		for (j = 1; j < edgeString.length(); ++j)
 		{
-			if (x[j] != edgeString[j])
+			if (VALS::contents[s_id][i + j] != edgeString[j])
 				break;
 		}
 
 		if (j >= edgeString.length())
-			return this->children[ALPHA_VALS[x[0]]]->findPath(s, i + j);
+			return findPath(child, i + j, s_id);
 		else
 		{
-			Node* newIntNode = new Node(0, this, nullptr, this->children[ALPHA_VALS[x[0]]]->str.first, j, -1);
-			newIntNode->children[ALPHA_VALS[x[j]]] = new Node(0, newIntNode, nullptr, i + j, x.length() - j, -1);
-			std::memcpy(&newIntNode->children[ALPHA_VALS[edgeString[j]]], &this->children[ALPHA_VALS[x[0]]], sizeof(Node*));
+			Node* newIntNode = new Node(0, u, nullptr, child->str.first, j, child->s_id);
+			// insert leaf node for s_id
+			newIntNode->children[VALS::ALPHA_VALS[VALS::contents[s_id][j + i]]] = new Node(VALS::numIntNodes++, newIntNode, nullptr, i + j, VALS::contents[s_id].substr(i).length() - j, s_id);
 
-			newIntNode->children[ALPHA_VALS[edgeString[j]]]->parent = newIntNode;
-			newIntNode->children[ALPHA_VALS[edgeString[j]]]->str = { this->children[ALPHA_VALS[x[0]]]->str.first + j, edgeString.length() - j };
-			this->children[ALPHA_VALS[x[0]]] = newIntNode;
+			std::memcpy(&newIntNode->children[VALS::ALPHA_VALS[edgeString[j]]], &child, sizeof(Node*));
 
-			// return new leaf
-			return newIntNode->children[ALPHA_VALS[x[j]]];
+			newIntNode->children[VALS::ALPHA_VALS[edgeString[j]]]->parent = newIntNode;
+			newIntNode->children[VALS::ALPHA_VALS[edgeString[j]]]->str = { child->str.first + j, edgeString.length() - j };
+			u->children[VALS::ALPHA_VALS[VALS::contents[s_id][i]]] = newIntNode;
+
+			return newIntNode->children[VALS::ALPHA_VALS[VALS::contents[s_id][j + i]]];
 		}
 	}
 	else
 	{
-		this->children[ALPHA_VALS[x[0]]] = new Node(0, this, nullptr, i, x.length(), -1);
-		return this->children[ALPHA_VALS[x[0]]];
-	}
-
-}
-
-
-
-
-
-std::string Node::get_path_label(std::string s)
-{
-	return s.substr(0, this->str.first + this->str.second);
-}
-
-
-/*
-
-Node* buildST(std::string s, Node* root, Node** deepestInternal)
-{
-	int i = 0;
-	// Add '$' to end of s. Signifies the end
-	s += "$";
-
-	Node* u, * v, * newLeaf = nullptr, * v_prime, * u_prime;
-
-	// if this node does not have a parent, it is the root
-	if (root == nullptr)
-	{
-		root = new Node(0, nullptr, nullptr, 0, 0, 1);
-		root->parent = root->SL = root;
-		root->strDepth = 0;
-		newLeaf = findPath(root, s, i);
-		i++;
-	}
-
-
-	for (; i < s.length(); ++i)
-	{
-		u = newLeaf->parent;
-		v = u->SL;
-
-		if (v) // Case I - SL(u) is known
+		// if this prefix has been inserted before
+		if (u->is_leaf() && u->SL == nullptr)
 		{
-			newLeaf = findPath(v, s, i + v->strDepth);
+			u->color = VALS::k + 1; // set leaf to mixed color due to reinsert
+			return u;
 		}
-		else // Case II - SL(u) is unknown
-		{
-			u_prime = u->parent;
-			v_prime = u_prime->SL;
+		u->children[VALS::ALPHA_VALS[VALS::contents[s_id][i]]] = new Node(VALS::numIntNodes++, u, nullptr, i, VALS::contents[s_id].length() - i, s_id);
+		return u->children[VALS::ALPHA_VALS[VALS::contents[s_id][i]]];
+	}
+}
 
-			if (u_prime != root) // Case IIA - SL(u) is unknown and u' is not the roo
+void Coloring(Node* u)
+{
+	if (u->is_leaf())
+	{
+		return;
+	}
+	else // u is not a leaf
+	{
+		for (auto c : u->children)
+		{
+			if (c)
+				Coloring(c);
+		}
+		// after all children have been visited
+		for (auto c : u->children)
+		{
+			if (c)
 			{
-				u->SL = nodeHops(v_prime, s.substr(u->str.first, u->str.second), s, i);
-				newLeaf = findPath(u->SL, s, i + u->SL->strDepth);
-			}
-			else // Case IIB - SL(u) is unknown and u' is the root
-			{
-				u->SL = nodeHops(root, s.substr(u->str.first + 1, u->str.second - 1), s, i);
-				newLeaf = findPath(u->SL, s, i + u->SL->strDepth);
+				if (c->color != u->color)
+				{
+					u->color = VALS::k + 1;
+				}
+				if (c->color != VALS::k + 1)
+				{
+					if (u->strDepth + 1 < VALS::shortestUniqueSubstr[c->s_id])
+						VALS::shortestUniqueSubstr[c->s_id] = u->strDepth + 1;
+				}
 			}
 		}
-
-		if (newLeaf->parent->strDepth > (*deepestInternal)->strDepth)
-			*deepestInternal = newLeaf->parent;
 	}
-
 }
-*/
+
 
