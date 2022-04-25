@@ -29,19 +29,21 @@ std::vector<std::string> get_input_files()
 std::vector<std::string> read_input_files(std::vector<std::string> files)
 {
 	// comment/uncomment to turn on/off automatic file selection
-	//files.resize(10);
-	//files = {
-	//	"Covid_Australia.fasta",
-	//	"Covid_Brazil.fasta",
-	//	"Covid_India.fasta",
-	//	"Covid_USA-CA4.fasta",
-	//	"Covid_Wuhan.fasta",
-	//	"MERS_2012_KF600620.fasta",
-	//	"MERS_2014_KY581694.fasta",
-	//	"MERS_2014_USA_KP223131.fasta",
-	//	"SARS_2003_GU553363.fasta",
-	//	"SARS_2017_MK062179.fasta"
-	//};
+	
+	files.resize(10);
+	files = {
+    	"Covid_Australia.fasta", // 0
+		"Covid_Brazil.fasta", // 1		
+		"Covid_India.fasta", // 2
+		"Covid_USA-CA4.fasta", // 3
+		"Covid_Wuhan.fasta", // 4
+		"MERS_2012_KF600620.fasta", // 5
+		"MERS_2014_KY581694.fasta", // 6
+		"MERS_2014_USA_KP223131.fasta", // 7
+		"SARS_2003_GU553363.fasta", // 8
+		"SARS_2017_MK062179.fasta" // 9
+	}; 
+	/*
 	files.resize(5);
 	files = {
 		"s1.txt",
@@ -50,7 +52,7 @@ std::vector<std::string> read_input_files(std::vector<std::string> files)
 		"s4.txt",
 		"s5.txt"
 	};
-
+	*/
 	int i = 0;
 	std::string line = "";
 	for (auto file : files)

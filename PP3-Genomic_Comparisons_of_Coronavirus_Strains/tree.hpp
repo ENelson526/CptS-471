@@ -35,6 +35,8 @@ public:
 		this->s_id = this->color = s_id;
 		if (parent)
 			this->strDepth = parent->strDepth + len;
+		else
+			this->strDepth = 0;
 		this->str = { start, len };
 		
 		for (int i = 0; i < ALPHA_VALS.size(); ++i)

@@ -21,13 +21,13 @@ int main()
 
 	// Task 2
 	
-	std::vector<std::vector<int>> table = similarity_map();
+	std::vector<std::vector<int>> test = similarity_map();
 	std::cout << "\n\n";
-	for (int i = 0; i < table.size(); ++i)
+	for (int i = 0; i < test.size(); ++i)
 	{
-		for (int j = 0; j < table[0].size(); ++j)
+		for (int j = 0; j < test[0].size(); ++j)
 		{
-			std::cout << table[i][j] << " ";
+			std::cout << test[i][j] << " ";
 		}
 		std::cout << std::endl;
 	}

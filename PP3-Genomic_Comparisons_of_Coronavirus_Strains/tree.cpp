@@ -1,5 +1,7 @@
 #include "tree.hpp"
 
+
+
 std::unordered_map<char, int> ALPHA_VALS;
 std::vector<std::string> contents;
 std::vector<int> shortestUniqueSubstr;
