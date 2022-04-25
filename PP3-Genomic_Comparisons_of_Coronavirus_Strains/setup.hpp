@@ -7,11 +7,15 @@
 #include <unordered_map>
 #include <string>
 #include <array>
+#include <algorithm>
+#include <cstring>
+#include <cstdint>
 
-// Global constant for the length of the alphabet. 
-// If longer than the alphabet, code should work, but will take more memory than needed.
-// If shorter than the alphabet, code will not work
-#define ALPHA_LEN 4
+
+extern std::unordered_map<char, int> ALPHA_VALS;
+extern std::vector<std::string> contents;
+extern std::vector<int> shortestUniqueSubstr;
+extern int k, numIntNodes;
 
 // Asks the user how many files they want to read from, takes in their names, and returns thems
 std::vector<std::string> get_input_files();
@@ -24,5 +28,7 @@ std::string get_alphabet_file();
 
 // Reads in the passed alphabet file and returns an unordered map of all characters in the alphabet
 std::unordered_map<char, int> read_alphabet_file(std::string a_file);
+
+void set_contents(std::vector<std::string>);
 
 #endif

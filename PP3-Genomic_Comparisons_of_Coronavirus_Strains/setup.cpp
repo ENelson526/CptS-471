@@ -35,23 +35,22 @@ std::vector<std::string> read_input_files(std::vector<std::string> files)
 	//	"Covid_Brazil.fasta",
 	//	"Covid_India.fasta",
 	//	"Covid_USA-CA4.fasta",
+	//	"Covid_Wuhan.fasta",
 	//	"MERS_2012_KF600620.fasta",
 	//	"MERS_2014_KY581694.fasta",
 	//	"MERS_2014_USA_KP223131.fasta",
 	//	"SARS_2003_GU553363.fasta",
 	//	"SARS_2017_MK062179.fasta"
 	//};
-	/*files.resize(5);
+	files.resize(5);
 	files = {
 		"s1.txt",
 		"s2.txt",
 		"s3.txt",
 		"s4.txt",
 		"s5.txt"
-	};*/
+	};
 
-
-	std::vector<std::string> contents;
 	int i = 0;
 	std::string line = "";
 	for (auto file : files)
@@ -71,7 +70,7 @@ std::vector<std::string> read_input_files(std::vector<std::string> files)
 		else
 			std::cout << "Failed to open file " << file << "... Skipping\n";
 	}
-
+	k = contents.size();
 	return contents;
 }
 
@@ -94,8 +93,7 @@ std::unordered_map<char, int> read_alphabet_file(std::string a_file)
 	}
 
 	// infile should be open
-	std::unordered_map<char, int> alphabet;
-	alphabet.insert(std::pair<char, int>('$', 0));
+	ALPHA_VALS.insert(std::pair<char, int>('$', 0));
 
 	std::string line = "";
 	std::getline(infile, line);
@@ -104,8 +102,17 @@ std::unordered_map<char, int> read_alphabet_file(std::string a_file)
 	{
 		// ignore space characters
 		if (c != ' ')
-			alphabet.insert(std::pair<char, int>(c, alphabet.size()));
+			ALPHA_VALS.insert(std::pair<char, int>(c, ALPHA_VALS.size()));
 	}
 
-	return alphabet;
+	return ALPHA_VALS;
+}
+
+void set_contents(std::vector<std::string> c)
+{
+	contents.resize(c.size());
+	for (int i = 0; i < c.size(); ++i)
+	{
+		contents[i] = c[i];
+	}
 }

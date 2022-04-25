@@ -1,11 +1,15 @@
 
 #include "tree.hpp"
+#include "matrix.hpp"
 
 std::unordered_map<char, int> u;
 int main()
 {
-	std::vector<std::string> contents = read_input_files(get_input_files());
+	read_input_files(get_input_files());
 	u = read_alphabet_file(get_alphabet_file());
+
+	// TASK 1
+	/*
 	VALS::VALS(u, contents);
 	Node* root = buildGST();
 	Coloring(root);
@@ -13,5 +17,20 @@ int main()
 	{
 		std::cout << i << " " << VALS::shortestUniqueSubstr[i] << std::endl;
 	}
+	*/
+
+	// Task 2
+	
+	std::vector<std::vector<int>> table = similarity_map();
+	std::cout << "\n\n";
+	for (int i = 0; i < table.size(); ++i)
+	{
+		for (int j = 0; j < table[0].size(); ++j)
+		{
+			std::cout << table[i][j] << " ";
+		}
+		std::cout << std::endl;
+	}
+
 	return 0;
 }
