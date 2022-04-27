@@ -4,9 +4,11 @@
 
 std::unordered_map<char, int> ALPHA_VALS;
 std::vector<std::string> contents;
-std::vector<int> shortestUniqueSubstr;
-int k, numIntNodes;
 
+// first : the starting index of the fingerprint
+// second : the length of the fingerprint
+std::vector<std::pair<int, int>> shortestUniqueSubstr;
+int k, numIntNodes;
 int numLeafs = 0;
 
 Node* buildGST()
@@ -181,8 +183,11 @@ void Coloring(Node* u)
 				}
 				if (c->color != k + 1)
 				{
-					if (u->strDepth + 1 < shortestUniqueSubstr[c->s_id])
-						shortestUniqueSubstr[c->s_id] = u->strDepth + 1;
+					if (u->strDepth + 1 < shortestUniqueSubstr[c->s_id].second)
+					{
+						shortestUniqueSubstr[c->s_id].first = c->str.first - u->strDepth;
+						shortestUniqueSubstr[c->s_id].second = u->strDepth + 1;
+					}
 				}
 			}
 		}
@@ -216,36 +221,12 @@ Node* find_LCS(Node* u)
 }
 
 
-/*
-Node* find_LCS(Node* u)
+void print_fingerprints_to_file()
 {
-	Node* temp = u;
-	int i = 0, max = -1;
-	for (auto c : u->children)
+	std::ofstream outfile("fingerprints.txt");
+	for (int i = 0; i < shortestUniqueSubstr.size(); ++i)
 	{
-		if (c)
-		{
-			if (c->color == k + 1)
-			{
-				if (!c->is_leaf())
-					temp = find_LCS(c);
-				else
-				{
-					if (max == -1)
-						max = i;
-					else if (c->strDepth > u->children[max]->strDepth)
-						max = i;
-				}
-			}
-		}
-		i++;
+		outfile << "s_id : " << i << "\t fingerprint : " << contents[i].substr(shortestUniqueSubstr[i].first, shortestUniqueSubstr[i].second) << std::endl; 
 	}
-	if (max == -1)
-		return temp;
-	if (temp->strDepth > u->children[max]->strDepth)
-		return temp;
-	else
-		return u->children[max];
+	outfile.close();
 }
-
-*/

@@ -3,7 +3,6 @@
 
 DP_cell** table;
 int rows = 0, cols = 0;
-//std::vector<std::vector<DP_cell*>> table;
 int g = -2, h = 0, match = 3, mismatch = -3;
 
 // reads a config file. This file is not a requirement.
@@ -77,31 +76,49 @@ void delete_table()
 
 std::vector<std::vector<int>> similarity_map()
 {
+	long double tree_total = 0, tree_avg = 0, matrix_total = 0, matrix_avg = 0;
+	int tree_count = 0, matrix_count = 0;
 	std::vector<std::vector<int>> D;
+	std::vector<std::vector<long double>> times;
 	D.resize(k);
+	times.resize(k);
 	for (int i = 0; i < D.size(); ++i)
 	{
 		D[i].resize(k);
+		times[i].resize(k);
 	}
-	int LCS = 0;
+	
 	int x_1 = 0, x_2 = 0;
+
 	shortestUniqueSubstr.resize(k);
 	for (auto c : shortestUniqueSubstr)
-		c = 0;
+	{
+		c.first = 0;
+		c.second = INT_MAX;
+	}
+
 	for (int i = 0; i < contents.size(); ++i)
 	{
 		for (int j = i + 1; j < contents.size(); ++j)
 		{
 			std::cout << "i : " << i << "\tj : " << j << std::endl;
+
+			auto tree_start = std::chrono::high_resolution_clock::now();
+
 			Node* root = new Node(0, nullptr, nullptr, 0, 0, i);
 			root->parent = root->SL = root;
 			root = build_ST(root, i);
 			root = build_ST(root, j);
 			Coloring(root);
 			Node* deepest = find_LCS(root);
+
+			auto tree_end = std::chrono::high_resolution_clock::now();
+			tree_total += std::chrono::duration_cast<std::chrono::milliseconds>(tree_end - tree_start).count();
+
 			std::cout << "LCS length : " << deepest->strDepth << "\n";
 			std::cout << *deepest << "\n";
 
+			auto matrix_start = std::chrono::high_resolution_clock::now();
 			if (deepest->is_leaf())
 			{
 				for (auto p : deepest->leaf_list)
@@ -133,10 +150,31 @@ std::vector<std::vector<int>> similarity_map()
 
 			D[i][j] = similarity_score(i, x_1, x_1 + deepest->strDepth, j, x_2, x_2 + deepest->strDepth);
 
+			auto matrix_end = std::chrono::high_resolution_clock::now();
+			times[i][j] = std::chrono::duration_cast<std::chrono::milliseconds>(matrix_end - matrix_start).count() + std::chrono::duration_cast<std::chrono::milliseconds>(tree_end - tree_start).count();
+			matrix_total += std::chrono::duration_cast<std::chrono::milliseconds>(matrix_end - matrix_start).count();
+			matrix_count++;
+			tree_count++;
+
 			delete root;
 			delete deepest;
 			std::cout << "END " << i << " " << j << "\n\n";
 		}
+	}
+
+	std::cout << "Tree time : " << tree_total << " ms\n";
+	std::cout << "Average Tree Time : " << tree_total / tree_count << " ms\n";
+	std::cout << "Matrix time : " << matrix_total << " ms\n";
+	std::cout << "Average Matrix Time : " << matrix_total / matrix_count << " ms\n";
+
+	// print time matrix
+	for (int i = 0; i < times.size(); ++i)
+	{
+		for (int j = 0; j < times[i].size(); ++j)
+		{
+			std::cout << times[i][j] << "\t";
+		}
+		std::cout << "\n";
 	}
 	return D;
 }
@@ -166,7 +204,9 @@ int similarity_score(int s_i, int x_1, int y_1, int s_j, int x_2, int y_2)
 	// as the Needleman-Wunsch's algorithm in the forward phase. However, find the cell with the maximum score, not necessarily the last cell
 	int a = fill_global_table(s_i_rev, s_j_rev);
 
+
 	delete_table();
+
 
 	// repeat of suffix after LCS
 	std::string s_i_fwd = contents[s_i].substr(y_1),
@@ -184,39 +224,9 @@ int similarity_score(int s_i, int x_1, int y_1, int s_j, int x_2, int y_2)
 }
 
 
-/*
-void zero_table()
-{
-	for (auto t : table)
-	{
-		for (auto i : t)
-			delete i;
-	}
-}
-
-void resize_table(int i, int j)
-{
-	zero_table();
-
-	
-	table.resize(i);
-	for (int t = 0; t < table.size(); ++t)
-		table[t].resize(j);
-	std::cout << "\n RESIZE DONE \n";
-	for (int t = 0; t < table.size(); ++t)
-	{
-		for (int r = 0; r < table[0].size(); ++r)
-			table[t][r] = new DP_cell();
-	}
-	
-	std::cout << "\n ALLOCATED \n";
-}
-*/
-
 int fill_global_table(std::string s1, std::string s2)
 {
 	std::cout << " x : " << s1.length() + 1 << ", y : " << s2.length() + 1 << "\n";
-	//resize_table(s1.length() + 1, s2.length() + 1);
 	
 	for (int i = 0; i < s1.length(); ++i)
 	{

@@ -68,5 +68,6 @@ Node* findPath(Node* u, int i, int s_id);
 Node* build_ST(Node* root, int s_id);
 void Coloring(Node* u);
 Node* find_LCS(Node*);
+void print_fingerprints_to_file();
 
 #endif

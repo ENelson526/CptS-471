@@ -6,14 +6,8 @@ std::vector<std::string> get_input_files()
 	do {
 		std::cout << "How many input files? : ";
 		std::cin >> num_files;
-	} while (num_files == -1);
+	} while (num_files < 1);
 
-	if (num_files == 0) {
-		std::cout << "Awesome! I don't have to do anything!\n";
-		abort();
-	}
-
-	// If we have to do things :(
 	std::vector<std::string> files;
 	for (int i = 0; i < num_files; i++) {
 		std::string file;
@@ -26,33 +20,49 @@ std::vector<std::string> get_input_files()
 }
 
 
-std::vector<std::string> read_input_files(std::vector<std::string> files)
+void read_input_files()
 {
+	std::vector<std::string> files;
 	// comment/uncomment to turn on/off automatic file selection
-	
-	files.resize(10);
-	files = {
-    	"Covid_Australia.fasta", // 0
-		"Covid_Brazil.fasta", // 1		
-		"Covid_India.fasta", // 2
-		"Covid_USA-CA4.fasta", // 3
-		"Covid_Wuhan.fasta", // 4
-		"MERS_2012_KF600620.fasta", // 5
-		"MERS_2014_KY581694.fasta", // 6
-		"MERS_2014_USA_KP223131.fasta", // 7
-		"SARS_2003_GU553363.fasta", // 8
-		"SARS_2017_MK062179.fasta" // 9
-	}; 
-	/*
-	files.resize(5);
-	files = {
-		"s1.txt",
-		"s2.txt",
-		"s3.txt",
-		"s4.txt",
-		"s5.txt"
-	};
-	*/
+	std::cout << "Please make a selection:\n1. Default DNA files\n2. Default English Files\n3. Custom inputs\n";
+	int selection = -1;
+	do {
+		std::cout << "Selection: ";
+		std::cin >> selection;
+	} while (selection == -1);
+
+
+	switch (selection) {
+		case 1:
+			files.resize(10);
+			files = {
+				".\\Sequences\\Covid_Australia.fasta", // 0
+				".\\Sequences\\Covid_Brazil.fasta", // 1		
+				".\\Sequences\\Covid_India.fasta", // 2
+				".\\Sequences\\Covid_USA-CA4.fasta", // 3
+				".\\Sequences\\Covid_Wuhan.fasta", // 4
+				".\\Sequences\\MERS_2012_KF600620.fasta", // 5
+				".\\Sequences\\MERS_2014_KY581694.fasta", // 6
+				".\\Sequences\\MERS_2014_USA_KP223131.fasta", // 7
+				".\\Sequences\\SARS_2003_GU553363.fasta", // 8
+				".\\Sequences\\SARS_2017_MK062179.fasta" // 9
+			}; 
+		break;
+		case 2:
+			files.resize(5);
+			files = {
+				".\\Sequences\\s1.txt", // 0
+				".\\Sequences\\s2.txt", // 1
+				".\\Sequences\\s3.txt", // 2
+				".\\Sequences\\s4.txt", // 3
+				".\\Sequences\\s5.txt"  // 4
+			};
+		break;
+		default: // If 3 or a non-existent option is selected
+			files = get_input_files();
+		break;
+	}
+
 	int i = 0;
 	std::string line = "";
 	for (auto file : files)
@@ -73,7 +83,6 @@ std::vector<std::string> read_input_files(std::vector<std::string> files)
 			std::cout << "Failed to open file " << file << "... Skipping\n";
 	}
 	k = contents.size();
-	return contents;
 }
 
 std::string get_alphabet_file()
@@ -85,12 +94,34 @@ std::string get_alphabet_file()
 }
 
 
-std::unordered_map<char, int> read_alphabet_file(std::string a_file)
+void read_alphabet_file()
 {
+	int a_sel = -1;
+	std::string a_file = "";
+	std::cout << "\nPlease make a selection:\n1. DNA Alphabet\n2. English Alphabet\n3. Custom alphabet\n";
+	do {
+		std::cout << "Selection: ";
+		std::cin >> a_sel;
+	} while (a_sel == -1);
+
+	switch (a_sel)
+	{
+		case 1:
+			a_file = ".\\Alphabets\\DNA_alphabet.txt";
+		break;
+		case 2:
+			a_file = ".\\Alphabets\\English_alphabet.txt";
+		break;
+		default: // If 3 or a non-existent option is selected
+			a_file = get_alphabet_file();
+		break;
+	}
+
+
 	std::ifstream infile(a_file);
 	while (!infile.is_open())
 	{
-		std::cout << "Failed to open alphabet file. It's kind of important so please try again.\n\n";
+		std::cout << "Failed to open alphabet file. It's kind of important so please enter another name.\n\n";
 		infile.open(get_alphabet_file());
 	}
 
@@ -105,16 +136,5 @@ std::unordered_map<char, int> read_alphabet_file(std::string a_file)
 		// ignore space characters
 		if (c != ' ')
 			ALPHA_VALS.insert(std::pair<char, int>(c, ALPHA_VALS.size()));
-	}
-
-	return ALPHA_VALS;
-}
-
-void set_contents(std::vector<std::string> c)
-{
-	contents.resize(c.size());
-	for (int i = 0; i < c.size(); ++i)
-	{
-		contents[i] = c[i];
 	}
 }
