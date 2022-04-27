@@ -37,3 +37,7 @@ ___
 ### Programming Project 3 (PP3) - Suffix Array Construction
 Given a group of sequence files, construct a Generalized Suffix Tree of all the sequences and find the shortest
 unique substring of each sequence.
+
+Then, for each pair of sequences, construct a GST and a similarity matrix. This will find the longest common substring and similarity score between the two sequences. The similarity score will be calculated using the affine gap penalty.
+
+There are multiple sample sequences and alphabets included in the repository. However, custom sequences and alphabets can be used. Please ensure that the custom sequence file follows the same format as the examples and that the custom alphabet is in lexiocgraphical order with spaces in between each character.
