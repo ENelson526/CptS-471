@@ -1,3 +1,5 @@
+## NOTE: If you are a student at WSU, please follow to the WSU Academic Integrity Policy in regards to this repository. The policy can be found [here](https://communitystandards.wsu.edu/policies-and-reporting/academic-integrity-policy/) <br> If you atttend any university other than WSU, please refer to your universities academic integrity policy.
+
 # CptS-471
 
 This is a repository for the Cpt_S 471 Computational Genomics class at WSU for the Spring 2022 semester. 
